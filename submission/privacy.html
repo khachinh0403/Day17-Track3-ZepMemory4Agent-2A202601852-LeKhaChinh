@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Lab 17 Privacy Drill Evidence</title>
+  <style>
+    body { background:#0f172a; color:#e2e8f0; font:18px/1.55 Consolas,monospace; margin:0; padding:48px; }
+    main { max-width:1050px; margin:auto; }
+    h1 { font:700 30px/1.2 system-ui; color:#f8fafc; }
+    .ok { color:#4ade80; font-weight:700; }
+    pre { background:#111827; border:1px solid #334155; border-left:5px solid #22c55e;
+          border-radius:12px; padding:24px; white-space:pre-wrap; }
+    .note { color:#94a3b8; font-family:system-ui; }
+  </style>
+</head>
+<body><main>
+  <h1>Lab 17 — Privacy Drill Evidence</h1>
+  <pre>$ python -m src.forget --user-id minh-lab17
+Deleting user-scoped memory for 'minh-lab17'...
+Redis keys deleted: 0
+<span class="ok">Zep user absent: True</span>
+<span class="ok">Redis user keys remaining: 0</span>
+Shared semantic KB remains intact because it stores domain knowledge, not user PII.
+
+$ python -m src.forget --user-id minh-lab17 --verify-only
+<span class="ok">Zep user absent: True</span>
+<span class="ok">Redis user keys remaining: 0</span>
+Shared semantic KB remains intact because it stores domain knowledge, not user PII.</pre>
+  <p class="note">Synthetic lab user only. Shared domain knowledge was intentionally retained.</p>
+</main></body></html>
