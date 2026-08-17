@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import json
 from typing import Any
 
 from .config import settings
@@ -43,7 +44,10 @@ class StudentMemory:
             facts = render_graph_search(results)
         except Exception:
             facts = ""
-        return join_nonempty((context_block, facts), sep="\n\n")
+        # In mixed retrieval the long-term slice is deliberately small. Put
+        # query-ranked facts first so literal task/project markers survive the
+        # budget trim; the richer Context Block remains available afterwards.
+        return join_nonempty((facts, context_block), sep="\n\n")
 
     def retrieve_episodic(self, user_id: str, query: str) -> str:
         # LAB TODO 2/4
@@ -82,6 +86,25 @@ class StudentMemory:
                 scope="nodes",
                 limit=8,
             )
+        # Semantic documents are ingested both as JSON and as plain text. Zep
+        # can therefore return the same summary twice, while empty metadata and
+        # JSON scaffolding consume the tight 3% mixed-context budget. Render a
+        # compact, de-duplicated list while preserving literal policy markers.
+        episodes: list[str] = []
+        for episode in getattr(results, "episodes", None) or []:
+            content = str(getattr(episode, "content", "") or "").strip()
+            if not content:
+                continue
+            try:
+                payload = json.loads(content)
+                if isinstance(payload, dict) and payload.get("summary"):
+                    content = str(payload["summary"]).strip()
+            except (json.JSONDecodeError, TypeError):
+                pass
+            if content and content not in episodes:
+                episodes.append(content)
+        if episodes:
+            return "\n".join(f"EPISODE: {content}" for content in episodes)
         return render_graph_search(results)
 
     def assemble_context(self, layers: dict[str, str]) -> tuple[str, dict[str, dict[str, int]]]:

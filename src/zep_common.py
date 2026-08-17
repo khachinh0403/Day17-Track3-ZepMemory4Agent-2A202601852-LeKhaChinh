@@ -111,7 +111,7 @@ def render_graph_search(results: Any, episode_char_cap: int | None = None) -> st
         metadata = getattr(episode, "metadata", None)
         if content:
             if episode_char_cap:
-                content = content[:episode_char_cap]
+                content = content[:episode_char_cap].rstrip()
                 parts.append(f"EPISODE: {content}")
             else:
                 parts.append(f"EPISODE: {content}\nmetadata={object_to_text(metadata)}")
